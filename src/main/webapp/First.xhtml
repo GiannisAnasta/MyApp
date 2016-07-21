@@ -1,0 +1,239 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"> 
+    <h:head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta http-equiv="X-UA-Conpatible" content="IE=edge" />
+        <h:outputStylesheet library="css" name="bootstrap.min.css"></h:outputStylesheet>
+        <title>Taxing App</title>
+
+    </h:head> 
+    <h:body> 
+
+        <div class="container">
+            <div class="navbar navbar-inverse">
+                <div class="navbar-brand">
+                    TAXING APP
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <h:form styleClass="form-horizontal">
+                        <div class="form-group">
+                            <h2>Adding Items</h2>
+
+                            <h:outputLabel value="Type :" styleClass="control-label col-sm-2"/>
+                            <div class="col-sm-10">
+                                <h:selectOneMenu style="color:white;" id="Type" value="#{userData.type}" required="true" >                    
+                                    <f:selectItem itemValue="" itemLabel="Select type" noSelectionOption="true"/>    
+                                    <f:selectItem itemValue="Car" itemLabel="Car"  />
+                                    <f:selectItem itemValue="Water" itemLabel="Water" />
+                                    <f:selectItem itemValue="Flat" itemLabel="Flat" />
+                                    <f:ajax render="@all"/>
+                                </h:selectOneMenu>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <h:outputLabel value="Name :" styleClass="control-label col-sm-2"/>
+                            <div class="col-sm-10">                                 
+                                <h:inputText value="#{userData.name}" styleClass="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <h:outputLabel value="Income or Outcome :" styleClass="control-label col-sm-2"/>
+                            <div class="col-sm-10">
+                                <h:selectOneRadio value="#{userData.incoutc}" >
+                                    <f:selectItem itemValue="true" itemLabel="Income"/>
+                                    <f:selectItem itemValue="false" itemLabel="Outcome"/>
+                                </h:selectOneRadio>
+                            </div>
+                        </div>
+                        <h:panelGrid rendered="#{userData.type eq 'Car'}">
+                            <h:outputText value="Data: " rendered="#{userData.type eq 'Car'}" />
+
+                            <h:inputText id="date" value="#{userData.yearManuf}" 
+                                         style="color:white;"
+                                         size="20" required="true" 
+                                         label="Receipt Date" >
+                                <f:ajax render="@all"/>					
+                                <f:convertDateTime pattern="d-M-yyyy" /> 
+
+                            </h:inputText>  
+                            Price:
+                            <h:inputText value="#{userData.cost}"
+                                         style="color:white;"
+                                         size="10" required="true"
+                                         label="Costing">
+                                <f:ajax render="@all" />
+                            </h:inputText>
+                            <img src="http://i.telegraph.co.uk/multimedia/archive/02799/Nissan-car-product_2799907b.jpg" alt="Smiley face" height="120" width="120"/> 
+                            <p>Date manufactured:</p>
+                            <h:outputText value="#{userData.yearManuf}">
+                                 
+                                <f:convertDateTime pattern="MM/dd/yyyy" />
+                            </h:outputText>
+
+                        </h:panelGrid>
+
+                        <h:panelGrid  rendered="#{userData.type eq 'Water'}">
+                            <h:outputText value="Add gallons:"  rendered="#{userData.type eq 'Water'}"/>
+                            <h:inputText value="#{userData.gallons}"
+                                         style="color:white;"
+                                         size="10" required="true"
+                                         label="gallons">
+                                <f:ajax render="@all"/>
+                            </h:inputText>  
+                            <img src="http://www.pharma-blog.ch/wp-content/uploads/2015/04/Wassermatratze-300x199.jpg" alt="Smiley face" height="120" widht="100"/>         
+
+                        </h:panelGrid >
+                        <h:panelGrid rendered="#{userData.type eq 'Flat'}">
+                            <h:outputText value="Add square meters:"  rendered="#{userData.type eq 'Flat'}"/>
+                            <h:inputText value="#{userData.squareMeters}"
+                                         style="color:white;"
+                                         size="10" required="true"
+                                         label="Meters">
+                                <f:ajax render="@all"/>
+                            </h:inputText>
+                            <img src="https://www.mathsisfun.com/definitions/images/square-m.gif" alt="Smiley face" height="140" width="140"/>
+                        </h:panelGrid>
+
+
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">               
+                                <h:commandButton action="#{userData.addItem()}" value="Add Item" styleClass="btn btn-default"/>        
+                            </div>
+                        </div>
+                    </h:form>
+                    <h3>Your items</h3>
+                    <table class="table table-bordered table-striped">
+
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Type</th>
+                                <th>Name</th>
+                                <th>Cost</th>
+                                <th>Income-Outcome</th>
+                                <th>Edit</th>
+                                <th></th>                             
+                                <th>Delete</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <ui:repeat var="item" value="#{userData.itemss}">                              
+                                <tr>
+                                    <td>
+                                        <h:form>
+                                            <h:outputText   value="#{item.id}" />
+                                        </h:form>
+
+                                    </td>
+
+
+                                    <td>  <h:form>
+                                            <h:column> 
+
+                                                <h:selectOneMenu style="color:white;" value="#{item.type}" rendered="#{item.canEdit}">
+                                                    <f:selectItem itemValue="Car" itemLabel="Car"  />
+                                                    <f:selectItem itemValue="Water" itemLabel="Water" />
+                                                    <f:selectItem itemValue="Flat" itemLabel="Flat" />
+                                                    <f:ajax/>
+                                                </h:selectOneMenu>
+
+
+                                                <h:outputText value="#{item.type}"
+                                                              rendered="#{not item.canEdit}"   />
+                                            </h:column>
+                                        </h:form>
+                                    </td>
+                                    <td>
+                                        <h:form>
+                                            <h:column>
+                                                <h:inputText style="color:white;" value="#{item.name}"
+                                                             size="10" rendered="#{item.canEdit}" >
+                                                    <f:ajax/> 
+                                                </h:inputText>
+                                                <h:outputText value="#{item.name}"
+                                                              rendered="#{not item.canEdit}" />
+                                            </h:column>
+                                        </h:form>
+
+                                    </td>
+                                    <td>
+                                        <h:form>
+                                            <h:column>
+                                                <h:inputText style="color:white;" value="#{item.cost}"
+                                                             size="10" rendered="#{item.canEdit}" >
+                                                    <f:ajax/> 
+                                                </h:inputText>
+                                                <h:outputText value="#{item.cost}" >
+
+                                                    rendered="#{not item.canEdit}" >
+                                                    <f:convertNumber type="currency" maxFractionDigits="5" />
+                                                </h:outputText>
+                                            </h:column>
+                                        </h:form>
+                                    </td>
+                                    <td> 
+                                        <h:form>
+                                            <h:column>
+                                                <f:facet name="header">Income/Outcome</f:facet>
+                                                <h:selectOneRadio value="#{item.incoutc}" rendered="#{item.canEdit}">
+                                                    <f:selectItem itemValue="true" itemLabel="Income"/>
+                                                    <f:selectItem itemValue="false" itemLabel="Outcome"/>
+                                                    <f:ajax/>
+
+                                                </h:selectOneRadio>
+
+                                                <h:outputText value="#{item.incoutc ? 'Income':'Outcome'}"
+                                                              rendered="#{not item.canEdit}"/>
+                                            </h:column>
+                                        </h:form>
+                                    </td>         
+                                    <td>
+                                        <h:form>
+                                            <h:column>
+
+                                                <h:commandButton style="color:white;" value="Edit" 
+                                                                 actionListener="#{userData.editItem(item)}" 
+                                                                 rendered="#{not item.canEdit}">  
+                                                </h:commandButton>
+
+                                            </h:column> 
+                                        </h:form>
+                                    </td>
+                                    <td>
+                                        <h:form>
+                                            <h:commandButton style="color:white;" value="Save" 
+                                                             actionListener="#{userData.saveItem(item)}" 
+                                                             rendered="#{item.canEdit}">  
+                                            </h:commandButton>
+                                        </h:form>
+                                    </td>
+                                    <td>
+
+                                        <h:form>
+
+                                            <h:commandButton style="color:white;" value="Delete" 
+                                                             actionListener="#{userData.deleteItem(item)}" 
+                                                             rendered="#{not item.canEdit}">  
+                                            </h:commandButton>
+
+                                        </h:form>
+                                    </td>
+                                </tr>
+                            </ui:repeat>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </h:body> 
+</html>
